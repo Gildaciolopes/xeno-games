@@ -10,6 +10,8 @@ import {
 import 'dotenv/config';
 import * as welcome from './commands/welcome.js';
 import * as rules from './commands/rules.js';
+import { handleMention } from './handlers/mentionReact.js';
+import { handleResenha } from './handlers/resenha.js';
 
 interface Command {
   data: SlashCommandBuilder;
@@ -17,7 +19,11 @@ interface Command {
 }
 
 const client = new Client({
-  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+  ],
 });
 
 const commands = new Collection<string, Command>();
@@ -39,6 +45,19 @@ client.on(Events.InteractionCreate, async (i) => {
     } else {
       await i.reply({ content: 'Erro.', flags: MessageFlags.Ephemeral }).catch(() => undefined);
     }
+  }
+});
+
+client.on(Events.MessageCreate, async (msg) => {
+  try {
+    await handleResenha(msg, client);
+  } catch (e) {
+    console.error('resenha error:', e);
+  }
+  try {
+    await handleMention(msg, client);
+  } catch (e) {
+    console.error('mention error:', e);
   }
 });
 
