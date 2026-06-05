@@ -1,0 +1,10 @@
+services:
+  bot:
+    build: .
+    container_name: xeno-games-bot
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      ASSETS_PATH: /app/assets
+    volumes:
+      - ./assets:/app/assets:ro

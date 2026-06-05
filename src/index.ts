@@ -1,0 +1,47 @@
+import {
+  Client,
+  GatewayIntentBits,
+  Events,
+  Collection,
+  MessageFlags,
+  ChatInputCommandInteraction,
+  SlashCommandBuilder,
+} from 'discord.js';
+import 'dotenv/config';
+import * as welcome from './commands/welcome.js';
+import * as rules from './commands/rules.js';
+
+interface Command {
+  data: SlashCommandBuilder;
+  execute: (i: ChatInputCommandInteraction) => Promise<void>;
+}
+
+const client = new Client({
+  intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages],
+});
+
+const commands = new Collection<string, Command>();
+commands.set(welcome.data.name, welcome as unknown as Command);
+commands.set(rules.data.name, rules as unknown as Command);
+
+client.once(Events.ClientReady, (c) => console.log(`logado: ${c.user.tag}`));
+
+client.on(Events.InteractionCreate, async (i) => {
+  if (!i.isChatInputCommand()) return;
+  const cmd = commands.get(i.commandName);
+  if (!cmd) return;
+  try {
+    await cmd.execute(i);
+  } catch (e) {
+    console.error(e);
+    if (i.replied || i.deferred) {
+      await i.followUp({ content: 'Erro.', flags: MessageFlags.Ephemeral }).catch(() => undefined);
+    } else {
+      await i.reply({ content: 'Erro.', flags: MessageFlags.Ephemeral }).catch(() => undefined);
+    }
+  }
+});
+
+const token = process.env.DISCORD_TOKEN;
+if (!token) throw new Error('DISCORD_TOKEN obrigatorio');
+client.login(token);
