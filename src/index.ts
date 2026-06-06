@@ -6,6 +6,7 @@ import {
   MessageFlags,
   ChatInputCommandInteraction,
   SlashCommandBuilder,
+  ActivityType,
 } from 'discord.js';
 import 'dotenv/config';
 import * as welcome from './commands/welcome.js';
@@ -30,7 +31,12 @@ const commands = new Collection<string, Command>();
 commands.set(welcome.data.name, welcome as unknown as Command);
 commands.set(rules.data.name, rules as unknown as Command);
 
-client.once(Events.ClientReady, (c) => console.log(`logado: ${c.user.tag}`));
+client.once(Events.ClientReady, (c) => {
+  console.log(`logado: ${c.user.tag}`);
+  c.user.setActivity('MC KATRINA - MEU SONHO É SER MC', {
+    type: ActivityType.Listening,
+  });
+});
 
 client.on(Events.InteractionCreate, async (i) => {
   if (!i.isChatInputCommand()) return;
