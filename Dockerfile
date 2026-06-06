@@ -19,4 +19,5 @@ COPY --from=build /app/dist ./dist
 COPY package.json ./
 COPY assets ./assets
 USER node
+EXPOSE 10000
 CMD ["node", "dist/index.js"]
