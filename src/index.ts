@@ -12,6 +12,7 @@ import { createServer } from 'node:http';
 import 'dotenv/config';
 import * as welcome from './commands/welcome.js';
 import * as rules from './commands/rules.js';
+import * as social from './commands/social.js';
 import { handleMention } from './handlers/mentionReact.js';
 import { handleResenha } from './handlers/resenha.js';
 
@@ -31,6 +32,7 @@ const client = new Client({
 const commands = new Collection<string, Command>();
 commands.set(welcome.data.name, welcome as unknown as Command);
 commands.set(rules.data.name, rules as unknown as Command);
+commands.set(social.data.name, social as unknown as Command);
 
 client.once(Events.ClientReady, (c) => {
   console.log(`logado: ${c.user.tag}`);
